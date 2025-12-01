@@ -1,0 +1,265 @@
+/* upload.css - Premium Compact Design */
+.upload-page-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1f2937;
+}
+
+/* Header Styles */
+.upload-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+/* Bin Info Section - Compact */
+.bin-info-section {
+  margin-bottom: 1.5rem;
+}
+
+.bin-info-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.bin-details {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.8125rem;
+  display: inline-block;
+  min-width: 70px;
+}
+
+.share-link {
+  color: #4f46e5;
+  font-size: 0.8125rem;
+  word-break: break-all;
+}
+
+.bin-timestamps {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.bin-timestamps p {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.qr-code {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.qr-label {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Upload Section - Compact */
+.upload-section {
+  margin-bottom: 1.5rem;
+}
+
+.upload-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+}
+
+.upload-area {
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f9fafb;
+}
+
+.upload-area:hover {
+  border-color: #818cf8;
+  background: #f5f3ff;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.upload-icon {
+  width: 32px;
+  height: 32px;
+  color: #6366f1;
+}
+
+.upload-title {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.upload-subtitle {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Files Section - Ultra Compact */
+.files-section {
+  margin-bottom: 1.5rem;
+}
+
+.files-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.files-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.files-title svg {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+}
+
+.files-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.files-table th {
+  padding: 0.5rem 0.75rem;
+  background-color: #f9fafb;
+  color: #4b5563;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  font-size: 0.6875rem;
+}
+
+.files-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #4b5563;
+  vertical-align: middle;
+}
+
+.files-table tr:last-child td {
+  border-bottom: none;
+}
+
+.files-table tr:hover td {
+  background-color: #f9fafb;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #1f2937;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: 1rem;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.8125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .upload-page-container {
+    padding: 1rem;
+  }
+
+  .bin-info-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .upload-area {
+    padding: 1.25rem;
+  }
+
+  .files-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* Micro-interactions */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.files-table tr {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.files-table tr:nth-child(even) {
+  animation-delay: 0.05s;
+}

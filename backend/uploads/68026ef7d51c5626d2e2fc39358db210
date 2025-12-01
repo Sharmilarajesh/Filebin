@@ -1,0 +1,41 @@
+
+
+import java.io.*;
+import java.util.Scanner;
+import java.net.*;
+public class Serverchat{
+
+public static void main(String[]args)throws IOException
+{
+ 
+ServerSocket serversocket=new ServerSocket(8000);
+Socket socket=serversocket.accept();
+DataInputStream inputFromClient=new DataInputStream(socket.getInputStream());
+DataOutputStream outputToClient=new DataOutputStream(socket.getOutputStream());
+Scanner sc=new Scanner(System.in);
+int msg;
+while(true)
+{
+ msg=inputFromClient.readInt();
+	if (msg == -1) {
+    break;
+}
+System.out.println("client says:"+msg);
+
+
+
+   int fact=1;
+	   for(int i=1;i<=msg;i++){
+	     fact=fact*i;
+	}  
+	System.out.println(fact);   
+	
+
+
+outputToClient.writeInt(fact);
+outputToClient.flush();
+}
+ socket.close();
+        serversocket.close();
+}
+}
