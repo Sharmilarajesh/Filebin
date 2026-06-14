@@ -1,29 +1,43 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { LogOut, UploadCloud, Trash2, Copy, Check, FileText } from "lucide-react";
+import api from "../utils/api";
 import "../styles/upload.css";
 
 export default function UploadPage() {
   const [binId, setBinId] = useState("");
   const [files, setFiles] = useState([]);
   const [stats, setStats] = useState({});
+  const [copied, setCopied] = useState(false);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  const handleCopyLink = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   // Create bin on load
   useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
     const createBin = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/create-bin", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/create-bin");
         setBinId(res.data.binId);
       } catch (err) {
-        console.error(err);
+        console.error("Error creating bin:", err);
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+        }
       }
     };
     createBin();
-  }, [token]);
+  }, [token, navigate]);
 
   // Upload file
   const handleUpload = async (e) => {
@@ -34,30 +48,67 @@ export default function UploadPage() {
     formData.append("file", file);
 
     try {
-      await axios.post(`http://localhost:5000/api/upload/${binId}`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
+      await api.post(`/upload/${binId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
 
       // Fetch updated files
-      const res = await axios.get(`http://localhost:5000/api/bin/${binId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setFiles(res.data.files);
+      const res = await api.get(`/bin/${binId}`);
+      setFiles(res.data.files || []);
       setStats({
         createdAt: new Date(res.data.createdAt).toLocaleString(),
         expiresAt: new Date(res.data.expiresAt).toLocaleString(),
         updatedAt: new Date().toLocaleString(),
       });
     } catch (err) {
-      console.error(err);
+      console.error("Error uploading file:", err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
     }
+  };
+
+  // Delete file
+  const handleDelete = async (fileName) => {
+    if (!window.confirm(`Are you sure you want to delete "${fileName}"?`)) return;
+    try {
+      await api.delete(`/delete/${binId}/${fileName}`);
+      
+      // Fetch updated files list
+      const res = await api.get(`/bin/${binId}`);
+      setFiles(res.data.files || []);
+      setStats(prev => ({
+        ...prev,
+        updatedAt: new Date().toLocaleString(),
+      }));
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
     <div className="upload-page-container">
       {/* Header Section */}
       <header className="upload-header">
-        <h1>UploadHub</h1>
+        <div className="header-logo">
+          <UploadCloud className="logo-icon" size={28} />
+          <h1>UploadHub</h1>
+        </div>
+        <button className="logout-btn" onClick={handleLogout}>
+          <LogOut size={16} />
+          Logout
+        </button>
       </header>
 
       {/* Bin Info Container */}
@@ -66,9 +117,18 @@ export default function UploadPage() {
           <div className="bin-details">
             <p><span className="detail-label">Bin ID:</span> {binId || "Creating..."}</p>
             {binId && (
-              <p><span className="detail-label">Share Link:</span> 
-                <span className="share-link">http://localhost:5173/bin/{binId}</span>
-              </p>
+              <div className="share-link-wrapper">
+                <span className="detail-label">Share Link:</span> 
+                <span className="share-link">{window.location.origin}/bin/{binId}</span>
+                <button 
+                  className={`copy-link-btn ${copied ? "copied" : ""}`}
+                  onClick={() => handleCopyLink(`${window.location.origin}/bin/${binId}`)}
+                  title="Copy Share Link"
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
             )}
             {stats.createdAt && (
               <div className="bin-timestamps">
@@ -81,7 +141,7 @@ export default function UploadPage() {
           {binId && (
             <div className="qr-container">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:5173/bin/${binId}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.origin}/bin/${binId}`}
                 alt="QR Code"
                 className="qr-code"
               />
@@ -96,9 +156,7 @@ export default function UploadPage() {
         <div className="upload-card">
           <label className="upload-area">
             <div className="upload-content">
-              <svg className="upload-icon" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-              </svg>
+              <UploadCloud className="upload-icon" size={40} />
               <p className="upload-title">Drag & drop files or click to browse</p>
               <p className="upload-subtitle">Supports all file types</p>
             </div>
@@ -119,21 +177,29 @@ export default function UploadPage() {
                   <th>Type</th>
                   <th>Size</th>
                   <th>Uploaded</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {files.map((file) => (
                   <tr key={file._id}>
-                    <td className="file-name">{file.fileName}</td>
+                    <td className="file-name" title={file.fileName}>{file.fileName}</td>
                     <td>{file.type}</td>
                     <td>{(file.size / 1024).toFixed(1)} KB</td>
                     <td>{new Date(file.uploadDate).toLocaleString()}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <button className="delete-btn" onClick={() => handleDelete(file.fileName)}>
+                        <Trash2 size={12} />
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
             <div className="empty-state">
+              <FileText size={32} className="empty-icon" />
               <p>No files uploaded yet</p>
             </div>
           )}

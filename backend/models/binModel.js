@@ -17,7 +17,8 @@ const binSchema = new mongoose.Schema({
   expiresAt: { type: Date }
 });
 
-// ✅ TTL Index for automatic deletion after expiresAt
-binSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// ❌ Removed TTL Index to avoid race conditions. 
+// If MongoDB deletes the bin document automatically, the midnight cron job cannot read the file paths from the database to delete physical files from the disk.
+// binSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model('Bin', binSchema);
