@@ -7,6 +7,7 @@ import fileRoutes from './routes/fileRoutes.js';
 import cron from 'node-cron';
 import fs from 'fs';
 import Bin from './models/binModel.js';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 dotenv.config();
 const app = express();
@@ -18,10 +19,26 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api', fileRoutes);
 
-// DB Connect
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ Mongo Error:", err));
+// DB Connect with fallback to in-memory MongoDB
+const connectDatabase = async () => {
+  let mongoUri = process.env.MONGO_URI;
+  try {
+    console.log("Connecting to MongoDB Atlas...");
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 4000 });
+    console.log("✅ MongoDB Connected");
+  } catch (err) {
+    console.log("❌ MongoDB Atlas connection failed. Starting in-memory MongoDB fallback...");
+    try {
+      const mongoServer = await MongoMemoryServer.create();
+      mongoUri = mongoServer.getUri();
+      await mongoose.connect(mongoUri);
+      console.log(`✅ In-memory MongoDB Connected at: ${mongoUri}`);
+    } catch (memErr) {
+      console.error("❌ Failed to start in-memory MongoDB fallback:", memErr);
+    }
+  }
+};
+connectDatabase();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on ${PORT}`));
@@ -44,6 +61,13 @@ cron.schedule('0 0 * * *', async () => {
       } catch (err) {
         console.log('File already deleted:', file.fileName);
       }
+    }
+    // Delete the bin document from database
+    try {
+      await Bin.deleteOne({ _id: bin._id });
+      console.log(`🧹 Cleaned up and deleted expired bin: ${bin.binId}`);
+    } catch (err) {
+      console.error(`❌ Error deleting expired bin ${bin.binId}:`, err);
     }
   }
 });

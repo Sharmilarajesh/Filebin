@@ -1,0 +1,40 @@
+# Dependency directories
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Local environment secret files (DO NOT COMMIT)
+.env
+.env*.local
+*.env
+backend/.env
+frontend/.env
+
+# Production builds
+dist/
+frontend/dist/
+dist-ssr/
+frontend/dist-ssr/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backend uploaded files (ephemeral storage)
+backend/uploads/
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDEs, editors, and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+test_upload.txt
